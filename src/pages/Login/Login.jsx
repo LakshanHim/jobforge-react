@@ -14,7 +14,7 @@ export default function Login() {
 
     useEffect(() => {
         if (localStorage.getItem("token")) {
-            navigate("/home");
+            navigate("/");
         }
     }, [navigate]);
 
@@ -36,7 +36,7 @@ export default function Login() {
                     console.log(token)
                     setMessage("Login successful! Redirecting...");
                     setIsError(true);
-                    setTimeout(() => navigate("/home"), 2000);
+                    setTimeout(() => navigate("/"), 2000);
                 } else {
                     setMessage("Token not received.");
                     setIsError(false);
