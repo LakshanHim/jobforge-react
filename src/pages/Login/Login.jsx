@@ -23,17 +23,17 @@ export default function Login() {
 
     const clckSignIN = async () => {
         const loginData = { "username": name, "password": password };
-    
+
         try {
             const response = await axios.post("http://localhost:8080/v1/user/login", loginData, {
                 headers: { "Content-Type": "application/json" },
             });
-    
+
             if (response.status === 201) {
                 const token = response.data;
+                console.log(response)
                 if (token) {
                     localStorage.setItem("token", token);
-                    console.log(token)
                     setMessage("Login successful! Redirecting...");
                     setIsError(true);
                     setTimeout(() => navigate("/"), 2000);
@@ -48,7 +48,7 @@ export default function Login() {
             setTimeout(() => setMessage(""), 3000);
         }
     };
-    
+
     return (
         <Box sx={{ display: "flex", height: "100vh" }}>
             <Box
@@ -96,6 +96,11 @@ export default function Login() {
                         Don’t have an account?{" "}
                         <Link to="/register" style={{ cursor: "pointer", fontWeight: "bold", textDecoration: "none" }}>
                             Sign up
+                        </Link>
+                    </Typography>
+                    <Typography variant="body2" align="center" fontWeight="bold">
+                        <Link to="/" style={{ cursor: "pointer", fontWeight: "bold", textDecoration: "none",color: "red" }}>
+                            Explore Without Login
                         </Link>
                     </Typography>
                 </Box>

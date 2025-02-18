@@ -8,20 +8,25 @@ import RegisterImage from "../../assets/regi.png";
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
-    const [name, setName] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [isError, setIsError] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
 
-    const inputName = (val) => setName(val.target.value);
+    const inputFirstName = (val) => setFirstName(val.target.value);
+    const inputLastName = (val) => setLastName(val.target.value);
+    const inputUsername = (val) => setUsername(val.target.value);
     const inputPassword = (val) => setPassword(val.target.value);
 
     const clickRegister = async () => {
+        console.log(firstName)
         setLoading(true);
 
-        const registerData = { "username": name, "password": password, "role": "USER" };
+        const registerData = { "firstname": firstName, "lastname": lastName, "username": username, "password": password, "role": "USER" };
 
         try {
             const response = await fetch("http://localhost:8080/v1/user/register", {
@@ -33,7 +38,9 @@ export default function Register() {
             if (response.ok) {
                 setMessage("Your registration is successful!");
                 setIsError(false);
-                setName("");   
+                setFirstName("");
+                setLastName("");
+                setUsername("");   
                 setPassword(""); 
             } else {
                 setMessage("Registration failed. Try again.");
@@ -56,7 +63,6 @@ export default function Register() {
 
     return (
         <Grid container sx={{ height: "100vh" }}>
-
             <Grid
                 item xs={12} sm={6}
                 sx={{
@@ -76,10 +82,26 @@ export default function Register() {
                         <TextField 
                             margin="normal" 
                             fullWidth 
-                            label="Full Name" 
+                            label="First Name" 
                             variant="outlined" 
-                            value={name} 
-                            onChange={inputName} 
+                            value={firstName} 
+                            onChange={inputFirstName} 
+                        />
+                        <TextField 
+                            margin="normal" 
+                            fullWidth 
+                            label="Last Name" 
+                            variant="outlined" 
+                            value={lastName} 
+                            onChange={inputLastName} 
+                        />
+                        <TextField 
+                            margin="normal" 
+                            fullWidth 
+                            label="Username" 
+                            variant="outlined" 
+                            value={username} 
+                            onChange={inputUsername} 
                         />
                         <TextField
                             margin="normal"
@@ -112,14 +134,13 @@ export default function Register() {
 
                         <Typography variant="body2" align="center">
                             Already have an account?{" "}
-                            <Link to="/" style={{ cursor: "pointer", fontWeight: "bold", textDecoration: "none", color: "#6B4EFF" }}>
+                            <Link to="/login" style={{ cursor: "pointer", fontWeight: "bold", textDecoration: "none", color: "#6B4EFF" }}>
                                 Log in
                             </Link>
                         </Typography>
                     </Box>
                 </Box>
             </Grid>
-
 
             <Backdrop open={loading} sx={{ color: "#fff", zIndex: 9999 }}>
                 <CircularProgress color="inherit" />
