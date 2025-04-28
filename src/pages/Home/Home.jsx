@@ -1,31 +1,114 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
-    Box, Button, TextField, Typography, Container, IconButton, Drawer, Avatar, Menu as MenuComponent, MenuItem as MenuItemComponent
+    Box, Button, TextField, Typography, Container, IconButton, Drawer, Avatar, Grid, Card, CardContent
 } from "@mui/material";
 import { useNavigate, Link } from "react-router-dom";
-import { Menu, Search, Mail, MapPin, Phone, Send, Briefcase } from "lucide-react";
-import { Add } from "@mui/icons-material";
+import { Menu as MenuIcon, Add, Facebook, Twitter, LinkedIn, YouTube, RssFeed } from "@mui/icons-material";
+import { Search, Mail, MapPin, Phone, Send, Briefcase } from "lucide-react";
 import logo from "../../assets/logo.png";
 import profile from "../../assets/profile-user.png";
-import { Facebook, Twitter, LinkedIn, YouTube, RssFeed } from "@mui/icons-material";
-import { Grid, Card, CardContent } from "@mui/material";
-
 
 export default function Home() {
     const [openMenu, setOpenMenu] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem("token");
         setIsAuthenticated(!!token);
+
     }, []);
 
-    const handleMenuToggle = () => {
-        setOpenMenu(!openMenu);
-    };
+    useEffect(() => {
+        const fetchJobs = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/v1/job_details/getAllDetailJob");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch jobs");
+                }
+                const data = await response.json();
+                setJobs(data);
+            } catch (error) {
+                console.error("Error fetching jobs:", error);
+            }
+        };
 
+        fetchJobs();
+    }, []);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const username = localStorage.getItem("username");
+                if (username) {
+                    const response = await fetch(`http://localhost:8080/v1/user/getUser/${username}`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        setUserDetails(data); ;
+                        if (data.email) localStorage.setItem("email", data.email);
+                        if (data.firstname) localStorage.setItem("firstname", data.firstname);
+                        if (data.lastname) localStorage.setItem("lastname", data.lastname);
+                        if (data.role) localStorage.setItem("role", data.role);
+                        if (data.registerDate) localStorage.setItem("registerDate", data.registerDate);
+
+                    } else {
+                        console.error("Failed to fetch user details.");
+                    }
+                } else {
+                    console.error("No username found in LocalStorage.");
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+
+    useEffect(() => {
+        const fetchProfileImage = async () => {
+            try {
+                const username = localStorage.getItem("username");
+                if (username) {
+                    const response = await fetch(`http://localhost:8080/v1/user/get/profileImg/${username}`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                            "Content-Type": "application/json",
+                        },
+                    });
+
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const imageUrl = URL.createObjectURL(blob);
+                        setProfileImageUrl(imageUrl);
+                    } else {
+                        console.error("Failed to fetch profile image");
+                    }
+                } else {
+                    console.error("Username not found in localStorage");
+                }
+            } catch (error) {
+                console.error("Error fetching profile image:", error);
+            }
+        };
+
+        fetchProfileImage();
+    }, []);
+
+    const [profileImageUrl, setProfileImageUrl] = useState("");
+    const [userDetails, setUserDetails] = useState([]);
+    const [jobs, setJobs] = useState([]);
+    const handleMenuToggle = () => setOpenMenu(!openMenu);
     const handleSignIn = () => navigate("/login");
     const handleProfileClick = (event) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
@@ -43,42 +126,6 @@ export default function Home() {
         { icon: <RssFeed />, link: "#" },
     ];
 
-    const jobs = [
-        {
-            title: "Junior QA Engineer",
-            company: "ShiftX",
-            category: "Accounting > Other",
-            type: "Full-Time",
-            location: "Colombo, Sri Lanka",
-            postedDate: "21/02/25",
-        },
-        {
-            title: "Full Stack Developer",
-            company: "PurePitch",
-            category: "Information & Communication Technology",
-            type: "Contract",
-            location: "Remote, Rotterdam, Netherlands",
-            postedDate: "21/02/25",
-        },
-        {
-            title: "Project Management Internship - Technical & Non-Technical",
-            company: "Tezzeract Pvt Ltd",
-            category: "Information & Communication Technology > Programme & Project Management",
-            type: "Internship",
-            location: "Colombo, Sri Lanka",
-            salary: "LKR 30,000 - 35,000/month",
-            postedDate: "21/02/25",
-        },
-        {
-            title: "Machine Learning Engineer",
-            company: "PurePitch",
-            category: "Information & Communication Technology",
-            type: "Contract",
-            location: "Remote, Rotterdam, Netherlands",
-            postedDate: "21/02/25",
-        }
-    ];
-
     return (
         <>
             <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh", paddingBottom: 4 }}>
@@ -87,153 +134,66 @@ export default function Home() {
                         <img src={logo} alt="JobForge Logo" style={{ height: 50, marginRight: 10 }} />
                         <Typography variant="h5" fontWeight="bold" sx={{ color: "#007BFF" }}>JobForge</Typography>
                     </Box>
-                    <Box sx={{ display: { xs: "block", md: "none" } }}>
-                        <IconButton onClick={handleMenuToggle}>
-                            <Menu />
-                        </IconButton>
-                    </Box>
-                    <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+                    <IconButton onClick={handleMenuToggle}><MenuIcon /></IconButton>
+                </Box>
+                <Drawer anchor="left" open={openMenu} onClose={handleMenuToggle}>
+                    <Box sx={{ width: 250, padding: 2 }}>
                         {isAuthenticated ? (
-                            <Box sx={{ display: "flex", alignItems: "center", ml: 3 }}>
-                                <Avatar src={profile} sx={{ width: 40, height: 40, mr: 1, cursor: "pointer" }} onClick={handleProfileClick} />
-                                <Typography variant="body1" fontWeight="bold" onClick={handleProfileClick} sx={{ cursor: "pointer" }}>Lakshan</Typography>
-                                <MenuComponent anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-                                    <MenuItemComponent onClick={handleLogout}>Logout</MenuItemComponent>
-                                </MenuComponent>
-                            </Box>
+                            <>
+                                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                                    <Avatar src={profileImageUrl} sx={{ width: 40, height: 40, mr: 1 }} />
+                                    <Typography variant="body1" fontWeight="bold">{userDetails.username}</Typography>
+                                </Box>
+                                <Button sx={{ color: "blue", width: "100%", marginBottom: 2, fontWeight: 'bold' }}>
+                                    <Link to="/profile" style={{ textDecoration: "none" }}>View Profile</Link>
+                                </Button>
+
+                                <Button sx={{ color: "#000", width: "100%", marginBottom: 2 }} onClick={handleLogout}>Logout</Button>
+                            </>
                         ) : (
                             <>
-                                <Button sx={{ color: "#000" }} startIcon={<Add />}>
-                                    <Link to="/company" style={{ cursor: "pointer", textDecoration: "none", color: 'black' }}>
-                                        Post a Job
-                                    </Link>
+                                <Button sx={{ color: "#000", width: "100%", marginBottom: 2 }} startIcon={<Add />}>
+                                    <Link to="/company" style={{ textDecoration: "none", color: "black" }}>Post a Job</Link>
                                 </Button>
-                                <Button sx={{ color: "#000" }}>
+                                <Button sx={{ color: "#000", width: "100%", marginBottom: 2 }}>
                                     <Link to="/login" style={{ textDecoration: "none", color: "black" }}>Sign In</Link>
                                 </Button>
-                                <Button variant="contained" color="primary" sx={{ ml: 2 }}>
+                                <Button variant="contained" color="primary" sx={{ width: "100%" }}>
                                     <Link to="/register" style={{ textDecoration: "none", color: "white" }}>Register Now</Link>
                                 </Button>
                             </>
                         )}
                     </Box>
-                </Box>
-
-                <Drawer
-                    anchor="left"
-                    open={openMenu}
-                    onClose={handleMenuToggle}
-                    sx={{
-                        display: { xs: "block", md: "none" },
-                        zIndex: 1200
-                    }}
-                >
-                    <Box sx={{ width: 250, padding: 2 }}>
-                        {isAuthenticated ? (
-                            <>
-                                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                                    <Avatar src={profile} sx={{ width: 40, height: 40, mr: 1 }} />
-                                    <Typography variant="body1" fontWeight="bold">Lakshan</Typography>
-                                </Box>
-                                <Button sx={{ color: "#000", width: "100%", marginBottom: 2 }} onClick={handleLogout}>
-                                    Logout
-                                </Button>
-                            </>
-                        ) : (
-                            <>
-                                <Button sx={{ color: "#000", width: "100%", marginBottom: 2 }}>
-                                    <Link to="/company" style={{ cursor: "pointer", textDecoration: "none", color: 'black' }}>
-                                        Post a Job
-                                    </Link>
-                                </Button>
-                                <Button sx={{ color: "#000", width: "100%", marginBottom: 2 }}>
-                                    <Link to="/login" style={{ textDecoration: "none", color: "black" }}>
-                                        Sign In
-                                    </Link>
-                                </Button>
-                                <Button variant="contained" color="primary" sx={{ width: "100%" }}>
-                                    <Link to="/register" style={{ textDecoration: "none", color: "white" }}>
-                                        Register Now
-                                    </Link>
-                                </Button>
-                            </>
-                        )}
-                    </Box>
-
                 </Drawer>
+
 
                 <Container maxWidth="xl" sx={{ marginTop: 6 }}>
                     <Typography variant="h3" fontWeight="bold" color="#000" maxWidth="md" sx={{ textAlign: "left", opacity: 0.6 }}>
                         Your next career move starts here—discover, apply, succeed!
                     </Typography>
-
-                    <Box
-                        sx={{
-                            display: "flex",
-                            flexDirection: { xs: "column", md: "row" },
-                            backgroundColor: "#fff",
-                            padding: 3,
-                            borderRadius: 1,
-                            marginTop: 4,
-                            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-                            alignItems: "center",
-                            mb: 2
-                        }}
-                    >
-                        <TextField
-                            label="Job title or keywords"
-                            variant="outlined"
-                            sx={{
-                                flexGrow: 10,
-                                mb: { xs: 2, md: 0 },
-                                mr: { md: 2 },
-                                "& .MuiInputBase-root": { height: 55 },
-                            }}
-                            InputProps={{
-                                startAdornment: <Search size={25} style={{ marginRight: 8 }} />,
-                            }}
-                        />
-
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            sx={{
-                                flexGrow: 1,
-                                minWidth: "200px",
-                                padding: 2,
-                                fontSize: 15,
-                                fontWeight: "bold",
-                                height: 55,
-                            }}
-                        >
-                            Search
-                        </Button>
+                    <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, backgroundColor: "#fff", padding: 3, borderRadius: 1, marginTop: 4, boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)", alignItems: "center", mb: 2 }}>
+                        <TextField label="Job title or keywords" variant="outlined" sx={{ flexGrow: 10, mb: { xs: 2, md: 0 }, mr: { md: 2 }, "& .MuiInputBase-root": { height: 55 } }} InputProps={{ startAdornment: <Search size={25} style={{ marginRight: 8 }} /> }} />
+                        <Button variant="contained" color="primary" sx={{ flexGrow: 1, minWidth: "200px", padding: 2, fontSize: 15, fontWeight: "bold", height: 55 }}>Search</Button>
                     </Box>
 
-                    {jobs.map((job, index) => (
-                        <Card key={index} sx={{ marginBottom: 2, boxShadow: 3, borderRadius: 2, padding: 2 }}>
+                    {jobs.map((job) => (
+                        <Card key={job.jobId} sx={{ marginBottom: 2, boxShadow: 3, borderRadius: 2, padding: 2 }}>
                             <CardContent>
-                                <Typography variant="h6" fontWeight="bold">{job.title}</Typography>
-                                <Typography variant="subtitle2" color="primary">{job.company}</Typography>
-                                <Typography variant="body2" color="text.secondary">{job.category}</Typography>
-
-                                <Box display="flex" alignItems="center" gap={1} mt={1}>
-                                    <Briefcase size={16} />
-                                    <Typography variant="body2">{job.type}</Typography>
-                                </Box>
-
-                                <Box display="flex" alignItems="center" gap={1} mt={1}>
-                                    <MapPin size={16} />
-                                    <Typography variant="body2">{job.location}</Typography>
-                                </Box>
+                                <Typography variant="h6" fontWeight="bold">{job.jobTitle}</Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                    {job.jobDescription}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                    Qualification: {job.qualification}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
+                                    Closing Date: {job.jobClosingDate}
+                                </Typography>
                             </CardContent>
                         </Card>
                     ))}
                 </Container>
-            </Box >
-
-
-
+            </Box>
 
             <Box
                 component="footer"
@@ -248,31 +208,25 @@ export default function Home() {
                     <Grid item xs={12} md={4}>
                         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                             <img src={logo} alt="JobForge Logo" style={{ height: 50, marginRight: 10 }} />
-                            <Typography variant="h5" fontWeight="bold" sx={{ color: "white" }}>JobForge</Typography>
+                            <Typography variant="h5" fontWeight="bold" sx={{ color: "white" }}>
+                                JobForge
+                            </Typography>
                         </Box>
                         <Typography variant="body2" sx={{ mb: 2 }}>
                             Simply #1 Real Estate Theme
                         </Typography>
                         <Box>
                             <Typography variant="body2" sx={{ mb: 1 }}>
-                                <a href="/" style={{ color: "white", textDecoration: "none" }}>
-                                    Home
-                                </a>
+                                <a href="/" style={{ color: "white", textDecoration: "none" }}>Home</a>
                             </Typography>
                             <Typography variant="body2" sx={{ mb: 1 }}>
-                                <a href="/blog" style={{ color: "white", textDecoration: "none" }}>
-                                    Blog
-                                </a>
+                                <a href="/blog" style={{ color: "white", textDecoration: "none" }}>Blog</a>
                             </Typography>
                             <Typography variant="body2" sx={{ mb: 1 }}>
-                                <a href="/list-layout" style={{ color: "white", textDecoration: "none" }}>
-                                    List Layout
-                                </a>
+                                <a href="/list-layout" style={{ color: "white", textDecoration: "none" }}>List Layout</a>
                             </Typography>
                             <Typography variant="body2">
-                                <a href="/contact" style={{ color: "white", textDecoration: "none" }}>
-                                    Contact
-                                </a>
+                                <a href="/contact" style={{ color: "white", textDecoration: "none" }}>Contact</a>
                             </Typography>
                         </Box>
                     </Grid>
@@ -283,9 +237,7 @@ export default function Home() {
                         </Typography>
                         <Box display="flex" alignItems="center" sx={{ mb: 1 }}>
                             <MapPin size={18} style={{ marginRight: 8 }} />
-                            <Typography variant="body2">
-                                'Thusara', Nauththuduwa, mathugama.
-                            </Typography>
+                            <Typography variant="body2">'Thusara', Nauththuduwa, Mathugama.</Typography>
                         </Box>
                         <Box display="flex" alignItems="center" sx={{ mb: 1 }}>
                             <Phone size={18} style={{ marginRight: 8 }} />
@@ -335,6 +287,7 @@ export default function Home() {
                     <Typography>Designed by Lakshan Himalaka</Typography>
                 </Box>
             </Box>
+
         </>
     );
 }

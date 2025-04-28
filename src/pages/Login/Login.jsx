@@ -18,6 +18,7 @@ export default function Login() {
         }
     }, [navigate]);
 
+    localStorage.setItem("username", name);
     const nameChange = (val) => setName(val.target.value);
     const passwordChange = (val) => setPassword(val.target.value);
 
@@ -31,7 +32,6 @@ export default function Login() {
 
             if (response.status === 201) {
                 const token = response.data;
-                console.log(response)
                 if (token) {
                     localStorage.setItem("token", token);
                     setMessage("Login successful! Redirecting...");
