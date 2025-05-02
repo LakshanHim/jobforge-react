@@ -12,18 +12,17 @@ export default function Login() {
     const [isError, setIsError] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (localStorage.getItem("token")) {
-            navigate("/");
-        }
-    }, [navigate]);
+    // useEffect(() => {
+    //     if (localStorage.getItem("token")) {
+    //         navigate("/home"); // Default redirect if token already exists
+    //     }
+    // }, [navigate]);
 
-    localStorage.setItem("username", name);
     const nameChange = (val) => setName(val.target.value);
     const passwordChange = (val) => setPassword(val.target.value);
 
     const clckSignIN = async () => {
-        const loginData = { "username": name, "password": password };
+        const loginData = { username: name, password: password };
 
         try {
             const response = await axios.post("http://localhost:8080/v1/user/login", loginData, {
@@ -34,15 +33,51 @@ export default function Login() {
                 const token = response.data;
                 if (token) {
                     localStorage.setItem("token", token);
-                    setMessage("Login successful! Redirecting...");
-                    setIsError(true);
-                    setTimeout(() => navigate("/"), 2000);
+                    localStorage.setItem("username", name);
+
+                    // Fetch user details using token
+                    const userResponse = await fetch(`http://localhost:8080/v1/user/getUser/${name}`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`,
+                        },
+                    });
+
+                    if (userResponse.ok) {
+                        const data = await userResponse.json();
+                        localStorage.setItem("userId", data.userId || "");
+                        localStorage.setItem("email", data.email || "");
+                        localStorage.setItem("firstname", data.firstname || "");
+                        localStorage.setItem("lastname", data.lastname || "");
+                        localStorage.setItem("role", data.role || "");
+                        localStorage.setItem("registerDate", data.registerDate || "");
+
+                        setMessage("Login successful! Redirecting...");
+                        setIsError(false);
+
+                        console.log(data.role)
+
+                        // Redirect based on user role
+                        if (data.role === "EMPLOYEES") {
+                            navigate("/home");
+                        } else if (data.role === "TRAINER") {
+                            navigate("/course");
+                        } else {
+                            navigate("/home"); 
+                        }
+
+                    } else {
+                        setMessage("Failed to fetch user data.");
+                        setIsError(true);
+                    }
                 } else {
                     setMessage("Token not received.");
-                    setIsError(false);
+                    setIsError(true);
                 }
             }
         } catch (error) {
+            console.error(error);
             setMessage("Login failed. Please check your username and password.");
             setIsError(true);
             setTimeout(() => setMessage(""), 3000);
@@ -98,8 +133,9 @@ export default function Login() {
                             Sign up
                         </Link>
                     </Typography>
+
                     <Typography variant="body2" align="center" fontWeight="bold">
-                        <Link to="/" style={{ cursor: "pointer", fontWeight: "bold", textDecoration: "none",color: "red" }}>
+                        <Link to="/" style={{ cursor: "pointer", fontWeight: "bold", textDecoration: "none", color: "red" }}>
                             Explore Without Login
                         </Link>
                     </Typography>
