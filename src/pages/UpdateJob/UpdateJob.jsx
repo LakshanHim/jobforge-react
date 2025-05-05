@@ -100,7 +100,7 @@ const UpdateJob = () => {
                 }
             );
             alert('Job updated successfully!');
-            navigate('/');
+            navigate('/home');
         } catch (error) {
             console.error('Error updating job:', error);
             alert('Failed to update job');

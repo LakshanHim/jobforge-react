@@ -8,19 +8,18 @@ import { Search, Mail, MapPin, Phone, Send } from "lucide-react";
 import logo from "../../assets/logo.png";
 
 export default function Home() {
-
     const username = localStorage.getItem("username");
     const [openMenu, setOpenMenu] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(true);
     const [profileImageUrl, setProfileImageUrl] = useState("");
     const [jobs, setJobs] = useState([]);
-    const [userRole, setUserRole] = useState(""); // 👈 New state for role
+    const [userRole, setUserRole] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        const role = localStorage.getItem("role"); // 👈 Fetch role from localStorage
+        const role = localStorage.getItem("role");
         setIsAuthenticated(!!token);
         if (role) setUserRole(role);
     }, []);

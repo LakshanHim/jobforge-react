@@ -139,13 +139,6 @@ const CoursePage = () => {
                     <Button
                         sx={{ color: "blue", width: "100%", marginBottom: 2, fontWeight: 'bold' }}
                         component={Link}
-                        to="/"
-                    >
-                        Home Page
-                    </Button>
-                    <Button
-                        sx={{ color: "blue", width: "100%", marginBottom: 2, fontWeight: 'bold' }}
-                        component={Link}
                         to="/profile"
                     >
                         VIEW PROFILE
@@ -153,9 +146,9 @@ const CoursePage = () => {
                     <Button
                         sx={{ color: "blue", width: "100%", marginBottom: 2, fontWeight: 'bold' }}
                         component={Link}
-                        to="/course"
+                        to="/home"
                     >
-                        Courses
+                        Job
                     </Button>
                     <Button
                         sx={{ color: "#000", width: "100%", marginBottom: 2 }}

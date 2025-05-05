@@ -155,13 +155,6 @@ const CoursePage = () => {
                     <Button
                         sx={{ color: "blue", width: "100%", marginBottom: 2, fontWeight: 'bold' }}
                         component={Link}
-                        to="/"
-                    >
-                        Home Page
-                    </Button>
-                    <Button
-                        sx={{ color: "blue", width: "100%", marginBottom: 2, fontWeight: 'bold' }}
-                        component={Link}
                         to="/profile"
                     >
                         VIEW PROFILE

@@ -24,6 +24,8 @@ const CoursePage = () => {
   const [courseImages, setCourseImages] = useState({});
   const [profileImageUrl, setProfileImageUrl] = useState("");
   const role = localStorage.getItem("role");
+  const userId = localStorage.getItem("userId");
+
 
   const handleMenuToggle = () => {
     setOpenMenu(!openMenu);
@@ -96,7 +98,10 @@ const CoursePage = () => {
     const fetchCourses = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get('http://localhost:8080/v1/course/getAllACourse', {
+        
+
+        
+        const response = await axios.get(`http://localhost:8080/v1/course/getCourseUserId/${userId}`, {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",

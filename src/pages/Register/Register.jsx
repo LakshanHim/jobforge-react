@@ -161,7 +161,6 @@ export default function Register() {
                                 </MenuItem> */}
                                 <MenuItem value="EMPLOYEES">EMPLOYEES</MenuItem>
                                 <MenuItem value="TRAINER">TRAINER</MenuItem>
-                                <MenuItem value="USER">USER</MenuItem>
                             </Select>
                         </FormControl>
 
@@ -177,7 +176,7 @@ export default function Register() {
 
                         <Typography variant="body2" align="center">
                             Already have an account?{" "}
-                            <Link to="/login" style={{ cursor: "pointer", fontWeight: "bold", textDecoration: "none", color: "#6B4EFF" }}>
+                            <Link to="/" style={{ cursor: "pointer", fontWeight: "bold", textDecoration: "none", color: "#6B4EFF" }}>
                                 Log in
                             </Link>
                         </Typography>
