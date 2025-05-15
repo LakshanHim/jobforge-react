@@ -11,10 +11,6 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Mail, MapPin, Phone, Send, Briefcase } from "lucide-react";
 
 
-
-
-
-
 const CoursePage = () => {
 
   const username = localStorage.getItem("username")
@@ -95,64 +91,76 @@ const CoursePage = () => {
 
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        
+  const fetchCourses = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      let response;
 
-        
-        const response = await axios.get(`http://localhost:8080/v1/course/getCourseUserId/${userId}`, {
+      if (role === "ADMIN") {
+        response = await axios.get("http://localhost:8080/v1/course/getAllACourse", {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           }
         });
-
-        const courses = response.data.content;
-        setCourses(courses);
-
-
-        for (const course of courses) {
-          await fetchCourseImage(course.courseId);
-        }
-
-      } catch (error) {
-        console.error("Failed to fetch courses:", error);
-      }
-    };
-
-    const fetchCourseImage = async (courseId) => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(`http://localhost:8080/v1/course/getImg/${courseId}`, {
-          method: "GET",
+      } else {
+        response = await axios.get(`http://localhost:8080/v1/course/getCourseUserId/${userId}`, {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
-          },
+          }
         });
-
-        if (response.ok) {
-          const blob = await response.blob();
-          const imageUrl = URL.createObjectURL(blob);
-          setCourseImages(prev => ({ ...prev, [courseId]: imageUrl }));
-        } else {
-          console.error(`Failed to fetch image for course ${courseId}`);
-        }
-      } catch (error) {
-        console.error(`Error fetching course image ${courseId}:`, error);
       }
-    };
 
-    fetchCourses();
-  }, []);
+      const courses = response.data.content;
+      setCourses(courses);
+
+      for (const course of courses) {
+        await fetchCourseImage(course.courseId);
+      }
+
+    } catch (error) {
+      console.error("Failed to fetch courses:", error);
+    }
+  };
+
+  const fetchCourseImage = async (courseId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/v1/course/getImg/${courseId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        setCourseImages(prev => ({ ...prev, [courseId]: imageUrl }));
+      } else {
+        console.error(`Failed to fetch image for course ${courseId}`);
+      }
+    } catch (error) {
+      console.error(`Error fetching course image ${courseId}:`, error);
+    }
+  };
+
+  fetchCourses();
+}, []);
+
+
+
+
 
 
 
 
   return (
     <Box>
-      {/* Top Navigation Bar */}
+
       <Box sx={{
         display: "flex",
         justifyContent: "space-between",
@@ -173,7 +181,7 @@ const CoursePage = () => {
         </IconButton>
       </Box>
 
-      {/* Side Drawer */}
+
       <Drawer anchor="left" open={openMenu} onClose={handleMenuToggle}>
         <Box sx={{ width: 250, padding: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -203,7 +211,7 @@ const CoursePage = () => {
         </Box>
       </Drawer>
 
-      {/* Courses */}
+
       <Container sx={{ mt: 5 }} maxWidth="xl">
         <Typography variant="h3" fontWeight="bold" color="#000" maxWidth="md" sx={{ textAlign: "left", opacity: 0.6 }}>
           Your next career move starts here—discover, apply, succeed!

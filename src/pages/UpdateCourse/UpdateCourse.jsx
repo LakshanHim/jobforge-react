@@ -116,7 +116,6 @@ const CoursePage = () => {
 
     return (
         <Box>
-            {/* Top Navigation Bar */}
             <Box sx={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -137,7 +136,7 @@ const CoursePage = () => {
                 </IconButton>
             </Box>
 
-            {/* Side Drawer */}
+
             <Drawer anchor="left" open={openMenu} onClose={handleMenuToggle}>
                 <Box sx={{ width: 250, padding: 2 }}>
                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>

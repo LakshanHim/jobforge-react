@@ -24,7 +24,7 @@ export default function Profile() {
     const firstName = localStorage.getItem("firstname");
     const lastName = localStorage.getItem("lastname");
     const email = localStorage.getItem("email");
-    const role = localStorage.getItem("role"); // Get role from localStorage
+    const role = localStorage.getItem("role"); 
 
     const handleMenuToggle = () => setOpenMenu(!openMenu);
     const navigate = useNavigate();
@@ -175,7 +175,7 @@ export default function Profile() {
 
     return (
         <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
-            {/* Top Navigation Bar */}
+
             <Box sx={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -196,7 +196,7 @@ export default function Profile() {
                 </IconButton>
             </Box>
 
-            {/* Drawer */}
+
             <Drawer anchor="left" open={openMenu} onClose={handleMenuToggle}>
                 <Box sx={{ width: 250, padding: 2 }}>
                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -204,7 +204,7 @@ export default function Profile() {
                         <Typography variant="body1" fontWeight="bold">{username}</Typography>
                     </Box>
 
-                    {/* Drawer Buttons by Role */}
+
                     {(role === "EMPLOYEES" || role === "ADMIN") && (
                         <Button
                             sx={{ color: "blue", width: "100%", marginBottom: 2, fontWeight: 'bold' }}
@@ -232,7 +232,7 @@ export default function Profile() {
                 </Box>
             </Drawer>
 
-            {/* Cover and Profile Images */}
+
             <Box sx={{ width: "100%", bgcolor: "#f5f5f5" }}>
                 <Box
                     sx={{
@@ -258,7 +258,7 @@ export default function Profile() {
                     />
                 </Box>
 
-                {/* Profile Details */}
+
                 <Box sx={{ marginTop: 10, paddingX: 5 }}>
                     <Typography variant="h5" fontWeight="bold">{username}</Typography>
                     <Typography variant="body1" color="text.secondary" mb={2}>
@@ -284,7 +284,7 @@ export default function Profile() {
                         </Box>
                     </Box>
 
-                    {/* Buttons Based on Role */}
+
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: -5 }}>
                         {role === "TRAINER" && (
                             <Button variant="outlined" color="primary" onClick={handleAddCourse}>
@@ -299,7 +299,7 @@ export default function Profile() {
                     </Box>
                 </Box>
 
-                {/* Cover Photo Card */}
+
                 <Box sx={{ marginTop: 5, paddingX: 5 }}>
                     <Card variant="outlined" sx={{ borderRadius: 3, boxShadow: 2 }}>
                         <CardContent>
@@ -316,7 +316,7 @@ export default function Profile() {
                     </Card>
                 </Box>
 
-                {/* Profile Picture Card */}
+
                 <Box sx={{ marginTop: 5, paddingX: 5, marginBottom: 5 }}>
                     <Card variant="outlined" sx={{ borderRadius: 3, boxShadow: 2 }}>
                         <CardContent>

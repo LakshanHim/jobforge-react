@@ -110,7 +110,6 @@ const UpdateJob = () => {
 
     return (
         <Box>
-            {/* Top Navigation Bar */}
             <Box sx={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -131,7 +130,7 @@ const UpdateJob = () => {
                 </IconButton>
             </Box>
 
-            {/* Side Drawer */}
+
             <Drawer anchor="left" open={openMenu} onClose={handleMenuToggle}>
                 <Box sx={{ width: 250, padding: 2 }}>
                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -150,7 +149,7 @@ const UpdateJob = () => {
                 </Box>
             </Drawer>
 
-            {/* Job Edit Form */}
+
             <Container maxWidth="sm">
                 <Box mt={4}>
                     <Typography variant="h5" gutterBottom>Update Job Details</Typography>

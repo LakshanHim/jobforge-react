@@ -27,7 +27,6 @@ const CoursePage = () => {
         e.preventDefault();
 
         try {
-            // Add course first
             const res = await axios.post(
                 `http://localhost:8080/v1/course/addCourse/${userId}`,
                 {
@@ -45,7 +44,7 @@ const CoursePage = () => {
                 }
             );
 
-            const courseId = res.data.courseId || res.data.id || 1; // adjust this depending on your backend response
+            const courseId = res.data.courseId || res.data.id || 1;
 
             if (courseImage && courseId) {
                 const formData = new FormData();
@@ -145,7 +144,6 @@ const CoursePage = () => {
                 </IconButton>
             </Box>
 
-            {/* Side Drawer */}
             <Drawer anchor="left" open={openMenu} onClose={handleMenuToggle}>
                 <Box sx={{ width: 250, padding: 2 }}>
                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>

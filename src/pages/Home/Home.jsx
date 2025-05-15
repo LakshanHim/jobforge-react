@@ -8,6 +8,7 @@ import { Search, Mail, MapPin, Phone, Send } from "lucide-react";
 import logo from "../../assets/logo.png";
 
 export default function Home() {
+
     const username = localStorage.getItem("username");
     const [openMenu, setOpenMenu] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -114,6 +115,41 @@ export default function Home() {
         { icon: <RssFeed />, link: "#" },
     ];
 
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        const role = localStorage.getItem("role");
+
+        setIsAuthenticated(!!token);
+        if (role) setUserRole(role);
+
+        if (role === "ADMIN") {
+            fetchAllJobs();
+        }
+    }, []);
+
+
+    const fetchAllJobs = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/v1/job_details/getAllJobs", {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch jobs");
+            const data = await response.json();
+            setJobs(data.content || []);
+            console.log(jobs)
+        } catch (error) {
+            console.error("Error fetching jobs:", error);
+        }
+    };
+
+
+
+
     return (
         <>
             <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh", paddingBottom: 4 }}>
@@ -137,7 +173,7 @@ export default function Home() {
                                     <Link to="/profile" style={{ textDecoration: "none" }}>View Profile</Link>
                                 </Button>
 
-                                {/* 👇 Only show Courses button if ADMIN */}
+
                                 {userRole === "ADMIN" && (
                                     <Button sx={{ color: "blue", width: "100%", marginBottom: 2, fontWeight: 'bold' }}>
                                         <Link to="/course" style={{ textDecoration: "none" }}>Courses</Link>
@@ -183,10 +219,33 @@ export default function Home() {
                             </CardContent>
                         </Card>
                     ))}
+
+                    {userRole === "ADMIN" && jobs.map((job) => (
+                        <Card key={job.jobId} sx={{ marginBottom: 2, boxShadow: 3, borderRadius: 2, padding: 2 }}>
+                            <CardContent>
+                                <Typography variant="h6" fontWeight="bold">{job.jobTitle}</Typography>
+                                <Typography variant="body2" sx={{ mt: 1 }}>{job.jobDescription}</Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                    Qualification: {job.qualification}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
+                                    Closing Date: {job.jobClosingDate}
+                                </Typography>
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: -5 }}>
+                                    <Button variant="outlined" color="primary" onClick={() => handleEdit(job)}>Edit</Button>
+                                    <Button variant="outlined" color="error" onClick={() => handleDelete(job.jobId)}>Delete</Button>
+                                </Box>
+
+                            </CardContent>
+                        </Card>
+                    ))}
+
+
+
                 </Container>
             </Box>
 
-            {/* Footer section remains unchanged */}
+
             <Box component="footer" sx={{ backgroundColor: "#222", color: "white", py: 4, px: { xs: 2, sm: 6, md: 10 } }}>
                 <Grid container spacing={4} justifyContent="space-between">
                     <Grid item xs={12} md={4}>
